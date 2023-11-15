@@ -9,6 +9,6 @@ import (
 
 func main() {
 	storage := poker.NewInMemoryStorage()
-	server := poker.PokerServer{ScoreStorage: &storage}
+	server := poker.NewServer(&storage)
 	log.Fatal(http.ListenAndServe(":8000", http.HandlerFunc(server.ServeHTTP)))
 }

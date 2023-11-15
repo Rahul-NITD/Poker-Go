@@ -12,7 +12,7 @@ func TestHTTPServer(t *testing.T) {
 	t.Run("Test GET route", func(t *testing.T) {
 
 		storage := NewSTUBStorage()
-		server := poker.PokerServer{&storage}
+		server := poker.NewServer(&storage)
 
 		cases := []struct {
 			title            string
@@ -59,7 +59,7 @@ func TestHTTPServer(t *testing.T) {
 
 	t.Run("Test POST route", func(t *testing.T) {
 		storage := NewSTUBStorage()
-		server := poker.PokerServer{&storage}
+		server := poker.NewServer(&storage)
 
 		cases := []struct {
 			title            string

@@ -13,10 +13,19 @@ type PokerStorage interface {
 
 type PokerServer struct {
 	ScoreStorage PokerStorage
+	http.Handler
 }
 
-func (server *PokerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func NewServer(storage PokerStorage) *PokerServer {
+	server := new(PokerServer)
+	server.ScoreStorage = storage
+	router := http.NewServeMux()
+	router.Handle("/players/", http.HandlerFunc(server.playersRouteHandler))
+	server.Handler = router
+	return server
+}
 
+func (server *PokerServer) playersRouteHandler(w http.ResponseWriter, r *http.Request) {
 	player := strings.TrimPrefix(r.URL.Path, "/players/")
 
 	switch r.Method {
@@ -26,7 +35,6 @@ func (server *PokerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
 		recordWin(w, player, server.ScoreStorage)
 	}
-
 }
 
 func getScore(w http.ResponseWriter, player string, storage PokerStorage) {
