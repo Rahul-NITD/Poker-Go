@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	storage := poker.NewInMemoryStorage()
-	server := poker.NewServer(&storage)
+	storage, close, _ := poker.NewDBStorage(false)
+	defer close(storage)
+	server := poker.NewServer(storage)
 	log.Fatal(http.ListenAndServe(":8000", http.HandlerFunc(server.ServeHTTP)))
 }
