@@ -8,6 +8,7 @@ import (
 
 type PokerStorage interface {
 	GetScore(player string) (int, error)
+	RecordWin(player string) error
 }
 
 type PokerServer struct {
@@ -17,7 +18,14 @@ type PokerServer struct {
 func (server *PokerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	player := strings.TrimPrefix(r.URL.Path, "/players/")
-	getScore(w, player, server.ScoreStorage)
+
+	switch r.Method {
+	case http.MethodGet:
+		getScore(w, player, server.ScoreStorage)
+	case http.MethodPost:
+		w.WriteHeader(http.StatusAccepted)
+		recordWin(w, player, server.ScoreStorage)
+	}
 
 }
 
@@ -33,4 +41,13 @@ func getScore(w http.ResponseWriter, player string, storage PokerStorage) {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, "Player Not Found")
 	}
+}
+
+func recordWin(w http.ResponseWriter, player string, storage PokerStorage) {
+	err := storage.RecordWin(player)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
 }

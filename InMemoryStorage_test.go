@@ -20,4 +20,24 @@ func TestInMemoryStorage(t *testing.T) {
 		AssertError(t, err, poker.ERRORPlayerNotFound)
 		AssertScores(t, got, 0)
 	})
+
+	t.Run("Test Recording existing dev", func(t *testing.T) {
+		want, _ := storage.GetScore("dev")
+		want++
+		err := storage.RecordWin("dev")
+		AssertNilError(t, err)
+		got, _ := storage.GetScore("dev")
+		AssertScores(t, got, want)
+	})
+
+	t.Run("Test Recording new player", func(t *testing.T) {
+		player := "IAmUndefined"
+		want, _ := storage.GetScore(player)
+		want++
+		err := storage.RecordWin(player)
+		AssertNilError(t, err)
+		got, _ := storage.GetScore(player)
+		AssertScores(t, got, want)
+	})
+
 }

@@ -49,6 +49,12 @@ func CreateGetRequest(path string) (*httptest.ResponseRecorder, *http.Request) {
 	return res, req
 }
 
+func CreatePostRequest(path string) (*httptest.ResponseRecorder, *http.Request) {
+	req, _ := http.NewRequest(http.MethodPost, path, nil)
+	res := httptest.NewRecorder()
+	return res, req
+}
+
 // STUBStorage
 type STUBStorage struct {
 	Scores map[string]int
@@ -60,6 +66,11 @@ func (str *STUBStorage) GetScore(player string) (int, error) {
 		return 0, poker.ERRORPlayerNotFound
 	}
 	return score, nil
+}
+
+func (str *STUBStorage) RecordWin(player string) error {
+	str.Scores[player]++
+	return nil
 }
 
 func NewSTUBStorage() STUBStorage {

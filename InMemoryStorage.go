@@ -12,6 +12,11 @@ func (str *InMemoryStorage) GetScore(player string) (int, error) {
 	return score, nil
 }
 
+func (str *InMemoryStorage) RecordWin(player string) error {
+	str.store[player]++
+	return nil
+}
+
 func NewInMemoryStorage() InMemoryStorage {
 	return InMemoryStorage{
 		store: map[string]int{
