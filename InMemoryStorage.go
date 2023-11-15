@@ -1,5 +1,7 @@
 package poker
 
+import "sort"
+
 type InMemoryStorage struct {
 	store map[string]int
 }
@@ -15,6 +17,22 @@ func (str *InMemoryStorage) GetScore(player string) (int, error) {
 func (str *InMemoryStorage) RecordWin(player string) error {
 	str.store[player]++
 	return nil
+}
+
+func (str *InMemoryStorage) GetLeague() []Player {
+	var res []Player
+	for key, value := range str.store {
+		res = append(res, Player{
+			Name: key,
+			Wins: value,
+		})
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Wins > res[j].Wins
+	})
+
+	return res
 }
 
 func NewInMemoryStorage() InMemoryStorage {

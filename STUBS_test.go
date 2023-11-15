@@ -3,6 +3,8 @@ package poker_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"reflect"
+	"sort"
 	"testing"
 
 	poker "github.com/Rahul-NITD/Poker"
@@ -42,6 +44,13 @@ func AssertScores(t testing.TB, got, want int) {
 	}
 }
 
+func AssertLeague(t testing.TB, got, want []poker.Player) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v != %v", got, want)
+	}
+}
+
 // REQUESTS
 func CreateGetRequest(path string) (*httptest.ResponseRecorder, *http.Request) {
 	req, _ := http.NewRequest(http.MethodGet, path, nil)
@@ -71,6 +80,22 @@ func (str *STUBStorage) GetScore(player string) (int, error) {
 func (str *STUBStorage) RecordWin(player string) error {
 	str.Scores[player]++
 	return nil
+}
+
+func (str *STUBStorage) GetLeague() []poker.Player {
+	var res []poker.Player
+	for key, value := range str.Scores {
+		res = append(res, poker.Player{
+			Name: key,
+			Wins: value,
+		})
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Wins > res[j].Wins
+	})
+
+	return res
 }
 
 func NewSTUBStorage() STUBStorage {

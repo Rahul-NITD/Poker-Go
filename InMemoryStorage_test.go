@@ -40,4 +40,22 @@ func TestInMemoryStorage(t *testing.T) {
 		AssertScores(t, got, want)
 	})
 
+	storage = poker.NewInMemoryStorage()
+	storage.RecordWin("TempBoi")
+
+	t.Run("Test League", func(t *testing.T) {
+		got := storage.GetLeague()
+		want := []poker.Player{
+			{
+				Name: "dev",
+				Wins: 5,
+			},
+			{
+				Name: "TempBoi",
+				Wins: 1,
+			},
+		}
+		AssertLeague(t, got, want)
+	})
+
 }

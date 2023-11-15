@@ -1,6 +1,8 @@
 package poker
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,6 +11,12 @@ import (
 type PokerStorage interface {
 	GetScore(player string) (int, error)
 	RecordWin(player string) error
+	GetLeague() []Player
+}
+
+type Player struct {
+	Name string
+	Wins int
 }
 
 type PokerServer struct {
@@ -21,6 +29,7 @@ func NewServer(storage PokerStorage) *PokerServer {
 	server.ScoreStorage = storage
 	router := http.NewServeMux()
 	router.Handle("/players/", http.HandlerFunc(server.playersRouteHandler))
+	router.Handle("/league", http.HandlerFunc(server.leagueRouteHandler))
 	server.Handler = router
 	return server
 }
@@ -34,7 +43,25 @@ func (server *PokerServer) playersRouteHandler(w http.ResponseWriter, r *http.Re
 	case http.MethodPost:
 		w.WriteHeader(http.StatusAccepted)
 		recordWin(w, player, server.ScoreStorage)
+	default:
+		w.WriteHeader(http.StatusBadRequest)
 	}
+}
+
+func (server *PokerServer) leagueRouteHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		getLeague(w, server.ScoreStorage)
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
+func getLeague(w http.ResponseWriter, storage PokerStorage) {
+	playersLeague := storage.GetLeague()
+	b := bytes.Buffer{}
+	json.NewEncoder(&b).Encode(playersLeague)
+	w.Write(b.Bytes())
 }
 
 func getScore(w http.ResponseWriter, player string, storage PokerStorage) {
