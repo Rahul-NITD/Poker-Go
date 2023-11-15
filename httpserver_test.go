@@ -23,19 +23,19 @@ func TestHTTPServer(t *testing.T) {
 			{
 				"Server Listens dev",
 				"/players/dev",
-				200,
+				http.StatusOK,
 				"1",
 			},
 			{
 				"Server listens Rahul",
 				"/players/Rahul",
-				200,
+				http.StatusOK,
 				"2",
 			},
 			{
 				"Server listens Akku",
 				"/players/Akku",
-				200,
+				http.StatusOK,
 				"3",
 			},
 			{
